@@ -103,7 +103,7 @@ public class StudentManagement {
 
     private static void printHeader() {
         System.out.println("\n========================================");
-        System.out.println("       STUDENT MANAGEMENT SYSTEM        ");
+        System.out.println("      SYS - STUDENT MANAGEMENT SYSTEM        ");
         System.out.println("========================================");
     }
 

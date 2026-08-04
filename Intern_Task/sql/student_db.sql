@@ -1,32 +1,94 @@
--- Student Management Database Setup Script
--- Compatible with PostgreSQL and MySQL
+-- =====================================================
+-- Student Management System
+-- Task 3 - MySQL Database
+-- =====================================================
 
--- 1. Database Creation (Run manually if required)
--- CREATE DATABASE student_db;
+-- ==========================================
+-- 1. Create Database
+-- ==========================================
 
--- 2. Drop existing table if exists
+CREATE DATABASE IF NOT EXISTS student_db;
+
+-- ==========================================
+-- 2. Use Database
+-- ==========================================
+
+USE student_db;
+
+-- ==========================================
+-- 3. Drop Existing Table (Optional)
+-- ==========================================
+
 DROP TABLE IF EXISTS students;
 
--- 3. Create Table Definition
+-- ==========================================
+-- 4. Create Students Table
+-- ==========================================
+
 CREATE TABLE students (
-    id SERIAL PRIMARY KEY,
+    id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
-    email VARCHAR(100) UNIQUE NOT NULL,
-    age INT NOT NULL CHECK (age >= 16 AND age <= 100),
-    course VARCHAR(100) NOT NULL,
-    grade DECIMAL(4, 2) NOT NULL CHECK (grade >= 0.00 AND grade <= 4.00),
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    email VARCHAR(100) NOT NULL UNIQUE,
+    phone VARCHAR(10) NOT NULL,
+    department VARCHAR(50) NOT NULL,
+    gender VARCHAR(10) NOT NULL,
+    dob DATE NOT NULL
 );
 
--- 4. Create Indexes for Search Performance Optimization
-CREATE INDEX idx_students_name ON students (name);
-CREATE INDEX idx_students_course ON students (course);
+-- ==========================================
+-- 5. Insert Student Records
+-- ==========================================
 
--- 5. Seed Database with Initial Student Entries
-INSERT INTO students (name, email, age, course, grade) VALUES
-('Alexander Wright', 'alex.wright@university.edu', 20, 'Computer Science', 3.85),
-('Sophia Martinez', 's.martinez@university.edu', 21, 'Data Science', 3.92),
-('Marcus Thompson', 'marcus.t@university.edu', 22, 'Mechanical Engineering', 2.85),
-('Emily Henderson', 'emily.h@university.edu', 19, 'Bioinformatics', 3.70),
-('Darius Miller', 'darius.m@university.edu', 23, 'Cybersecurity', 1.82),
-('Livia Vance', 'liv.vance@university.edu', 20, 'Civil Engineering', 3.45);
+INSERT INTO students
+(name, email, phone, department, gender, dob)
+VALUES
+('Tanguturin Venkata Sujith Gopi', '99220041389@klu.ac.in', '7989418257', 'CS', 'Male', '2004-07-05'),
+('Rahul Sharma', 'rahul@klu.ac.in', '9876543210', 'IT', 'Male', '2003-02-10'),
+('Priya Patel', 'priya@klu.ac.in', '9876543211', 'CS', 'Female', '2002-08-15'),
+('Ananya Singh', 'ananya@klu.ac.in', '9876543212', 'ECE', 'Female', '2003-05-21'),
+('Arjun Kumar', 'arjun@klu.ac.in', '9876543213', 'Mechanical', 'Male', '2002-11-30'),
+('Sneha Reddy', 'sneha@klu.ac.in', '9876543214', 'Civil', 'Female', '2003-01-18');
+
+-- ==========================================
+-- 6. Display All Students
+-- ==========================================
+
+SELECT * FROM students;
+
+-- ==========================================
+-- 7. Search Students by Department
+-- ==========================================
+
+SELECT *
+FROM students
+WHERE department = 'IT';
+
+-- ==========================================
+-- 8. Update Student Phone Number
+-- ==========================================
+
+UPDATE students
+SET phone = '9999999999'
+WHERE id = 2;
+
+-- Verify Update
+SELECT *
+FROM students
+WHERE id = 2;
+
+-- ==========================================
+-- 9. Delete Student Record
+-- ==========================================
+
+DELETE FROM students
+WHERE id = 5;
+
+-- Verify Remaining Records
+SELECT * FROM students;
+
+-- ==========================================
+-- 10. Count Total Students (Optional)
+-- ==========================================
+
+SELECT COUNT(*) AS Total_Students
+FROM students;
