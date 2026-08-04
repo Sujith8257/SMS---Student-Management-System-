@@ -1,7 +1,10 @@
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Scanner;
 
 public class StudentManagement {
+    private static final String FILE_NAME = "students.txt";
+
     // Inner class representing a Student
     public static class Student {
         private static int idCounter = 101; // Auto-incrementing ID start
@@ -11,8 +14,18 @@ public class StudentManagement {
         private String phone;
         private String department;
 
+        // Constructor for new students (auto-generates ID)
         public Student(String name, String email, String phone, String department) {
             this.id = idCounter++;
+            this.name = name;
+            this.email = email;
+            this.phone = phone;
+            this.department = department;
+        }
+
+        // Constructor for loading existing students
+        public Student(int id, String name, String email, String phone, String department) {
+            this.id = id;
             this.name = name;
             this.email = email;
             this.phone = phone;
@@ -36,10 +49,8 @@ public class StudentManagement {
     private static ArrayList<Student> studentList = new ArrayList<>();
 
     public static void main(String[] args) {
-        // Prepopulate with seed data matching Task 1
-        studentList.add(new Student("Rahul Sharma", "rahul@klu.ac.in", "9876543210", "IT"));
-        studentList.add(new Student("Priya Patel", "priya.p@klu.ac.in", "9876543211", "CS"));
-        studentList.add(new Student("Ananya Singh", "asingh@klu.ac.in", "9876543212", "ECE"));
+        // Load records from local file
+        loadStudentsFromFile();
 
         Scanner scanner = new Scanner(System.in);
         boolean exit = false;
@@ -86,6 +97,60 @@ public class StudentManagement {
         System.out.println("========================================");
     }
 
+    // Method to load students from text file
+    private static void loadStudentsFromFile() {
+        File file = new File(FILE_NAME);
+        if (!file.exists()) {
+            // Prepopulate seed data if file doesn't exist yet
+            studentList.add(new Student("Rahul Sharma", "rahul@klu.ac.in", "9876543210", "IT"));
+            studentList.add(new Student("Priya Patel", "priya.p@klu.ac.in", "9876543211", "CS"));
+            studentList.add(new Student("Ananya Singh", "asingh@klu.ac.in", "9876543212", "ECE"));
+            saveStudentsToFile();
+            return;
+        }
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+            String line;
+            int maxId = 100;
+            while ((line = reader.readLine()) != null) {
+                String[] parts = line.split(",", -1);
+                if (parts.length == 5) {
+                    try {
+                        int id = Integer.parseInt(parts[0].trim());
+                        String name = parts[1].trim();
+                        String email = parts[2].trim();
+                        String phone = parts[3].trim();
+                        String department = parts[4].trim();
+                        
+                        Student s = new Student(id, name, email, phone, department);
+                        studentList.add(s);
+                        if (id > maxId) {
+                            maxId = id;
+                        }
+                    } catch (NumberFormatException e) {
+                        // Ignore corrupt rows
+                    }
+                }
+            }
+            // Update counter sequence
+            Student.idCounter = maxId + 1;
+        } catch (IOException e) {
+            System.out.println("Error loading student records from file: " + e.getMessage());
+        }
+    }
+
+    // Method to save students to text file
+    private static void saveStudentsToFile() {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(FILE_NAME))) {
+            for (Student s : studentList) {
+                writer.write(String.format("%d,%s,%s,%s,%s\n", 
+                        s.getId(), s.getName(), s.getEmail(), s.getPhone(), s.getDepartment()));
+            }
+        } catch (IOException e) {
+            System.out.println("Error saving student records to file: " + e.getMessage());
+        }
+    }
+
     // Method to add a new student
     private static void addStudent(Scanner scanner) {
         System.out.println("--- Add Student ---");
@@ -120,6 +185,7 @@ public class StudentManagement {
 
         Student student = new Student(name, email, phone, department);
         studentList.add(student);
+        saveStudentsToFile(); // Save changes to disk
         System.out.println("\nSuccess: Student added successfully with ID: " + student.getId());
     }
 
@@ -205,6 +271,7 @@ public class StudentManagement {
             String confirm = scanner.nextLine().trim().toLowerCase();
             if (confirm.equals("y") || confirm.equals("yes")) {
                 studentList.remove(toRemove);
+                saveStudentsToFile(); // Save changes to disk
                 System.out.println("\nSuccess: Student record deleted successfully.");
             } else {
                 System.out.println("Delete action cancelled.");
