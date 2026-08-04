@@ -190,7 +190,8 @@ Develop a console-based Student Management System using Java.
 1. Add Student
 2. View Students
 3. Search Student
-4. Exit
+4. Delete Student
+5. Exit
 ```
 
 ---
@@ -212,6 +213,12 @@ Displays all student records stored in memory.
 ### Search Student
 
 Searches students by their name.
+
+---
+
+### Delete Student
+
+Allows the user to enter a student ID, requests confirmation, and deletes the record from memory.
 
 ---
 
@@ -337,6 +344,7 @@ java StudentManagement
 * Add student
 * View all students
 * Search student
+* Delete student
 * Exit application
 
 ---
