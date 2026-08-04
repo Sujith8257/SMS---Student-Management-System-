@@ -179,6 +179,10 @@ public class StudentManagement {
     // Method to delete a student by ID
     private static void deleteStudent(Scanner scanner) {
         System.out.println("--- Delete Student ---");
+        viewStudents();
+        if (studentList.isEmpty()) {
+            return;
+        }
         System.out.print("Enter Student ID to delete: ");
         int id;
         try {
