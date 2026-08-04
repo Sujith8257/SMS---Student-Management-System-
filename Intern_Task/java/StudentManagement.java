@@ -49,8 +49,9 @@ public class StudentManagement {
             System.out.println("1. Add Student");
             System.out.println("2. View Students");
             System.out.println("3. Search Student");
-            System.out.println("4. Exit");
-            System.out.print("\nEnter your choice (1-4): ");
+            System.out.println("4. Delete Student");
+            System.out.println("5. Exit");
+            System.out.print("\nEnter your choice (1-5): ");
 
             String choice = scanner.nextLine().trim();
             System.out.println();
@@ -66,11 +67,14 @@ public class StudentManagement {
                     searchStudent(scanner);
                     break;
                 case "4":
+                    deleteStudent(scanner);
+                    break;
+                case "5":
                     System.out.println("Exiting the application. Goodbye!");
                     exit = true;
                     break;
                 default:
-                    System.out.println("Invalid choice! Please select an option between 1 and 4.");
+                    System.out.println("Invalid choice! Please select an option between 1 and 5.");
             }
         }
         scanner.close();
@@ -169,6 +173,40 @@ public class StudentManagement {
 
         if (!found) {
             System.out.println("No matching student records found.");
+        }
+    }
+
+    // Method to delete a student by ID
+    private static void deleteStudent(Scanner scanner) {
+        System.out.println("--- Delete Student ---");
+        System.out.print("Enter Student ID to delete: ");
+        int id;
+        try {
+            id = Integer.parseInt(scanner.nextLine().trim());
+        } catch (NumberFormatException e) {
+            System.out.println("Error: Invalid ID format. Please enter a valid number.");
+            return;
+        }
+
+        Student toRemove = null;
+        for (Student student : studentList) {
+            if (student.getId() == id) {
+                toRemove = student;
+                break;
+            }
+        }
+
+        if (toRemove != null) {
+            System.out.print("Are you sure you want to delete student " + toRemove.getName() + "? (Y/N): ");
+            String confirm = scanner.nextLine().trim().toLowerCase();
+            if (confirm.equals("y") || confirm.equals("yes")) {
+                studentList.remove(toRemove);
+                System.out.println("\nSuccess: Student record deleted successfully.");
+            } else {
+                System.out.println("Delete action cancelled.");
+            }
+        } else {
+            System.out.println("Error: Student record with ID " + id + " not found.");
         }
     }
 }
