@@ -3,33 +3,42 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 public class StudentManagement {
-    private static final String FILE_NAME = "students.txt";
+    private static final String FILE_NAME = "students.dat";
 
     // Inner class representing a Student
-    public static class Student {
+    public static class Student implements Serializable {
+        private static final long serialVersionUID = 1L;
         private static int idCounter = 101; // Auto-incrementing ID start
         private int id;
         private String name;
         private String email;
         private String phone;
         private String department;
+        private String gender;
+        private String dateOfBirth;
 
         // Constructor for new students (auto-generates ID)
-        public Student(String name, String email, String phone, String department) {
+        public Student(String name, String email, String phone, String department,
+                       String gender, String dateOfBirth) {
             this.id = idCounter++;
             this.name = name;
             this.email = email;
             this.phone = phone;
             this.department = department;
+            this.gender = gender;
+            this.dateOfBirth = dateOfBirth;
         }
 
         // Constructor for loading existing students
-        public Student(int id, String name, String email, String phone, String department) {
+        public Student(int id, String name, String email, String phone, String department,
+                       String gender, String dateOfBirth) {
             this.id = id;
             this.name = name;
             this.email = email;
             this.phone = phone;
             this.department = department;
+            this.gender = gender;
+            this.dateOfBirth = dateOfBirth;
         }
 
         // Getters
@@ -38,19 +47,20 @@ public class StudentManagement {
         public String getEmail() { return email; }
         public String getPhone() { return phone; }
         public String getDepartment() { return department; }
+        public String getGender() { return gender; }
+        public String getDateOfBirth() { return dateOfBirth; }
 
         @Override
         public String toString() {
-            return String.format("| %-4d | %-20s | %-28s | %-12s | %-12s |", 
-                    id, name, email, phone, department);
+            return String.format("| %-4d | %-18s | %-24s | %-10s | %-8s | %-8s | %-10s |",
+                    id, name, email, phone, department, gender, dateOfBirth);
         }
     }
 
     private static ArrayList<Student> studentList = new ArrayList<>();
 
     public static void main(String[] args) {
-        // Load records from local file
-        loadStudentsFromFile();
+        loadStudents();
 
         Scanner scanner = new Scanner(System.in);
         boolean exit = false;
@@ -97,64 +107,56 @@ public class StudentManagement {
         System.out.println("========================================");
     }
 
-    // Method to load students from text file
-    private static void loadStudentsFromFile() {
+    private static void printTableHeader() {
+        System.out.println("+------+--------------------+--------------------------+------------+----------+----------+------------+");
+        System.out.println("| ID   | Name               | Email                    | Phone      | Dept     | Gender   | DOB        |");
+        System.out.println("+------+--------------------+--------------------------+------------+----------+----------+------------+");
+    }
+
+    private static void printTableFooter() {
+        System.out.println("+------+--------------------+--------------------------+------------+----------+----------+------------+");
+    }
+
+    // Load students from serialized file
+    private static void loadStudents() {
         File file = new File(FILE_NAME);
         if (!file.exists()) {
-            // Prepopulate seed data if file doesn't exist yet
-            studentList.add(new Student("Rahul Sharma", "rahul@klu.ac.in", "9876543210", "IT"));
-            studentList.add(new Student("Priya Patel", "priya.p@klu.ac.in", "9876543211", "CS"));
-            studentList.add(new Student("Ananya Singh", "asingh@klu.ac.in", "9876543212", "ECE"));
-            saveStudentsToFile();
+            studentList.add(new Student("Rahul Sharma", "rahul@klu.ac.in", "9876543210", "IT", "Male", "15/03/2002"));
+            studentList.add(new Student("Priya Patel", "priya.p@klu.ac.in", "9876543211", "CS", "Female", "22/07/2001"));
+            studentList.add(new Student("Ananya Singh", "asingh@klu.ac.in", "9876543212", "ECE", "Female", "10/11/2003"));
+            saveStudents();
             return;
         }
 
-        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
-            String line;
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {
+            @SuppressWarnings("unchecked")
+            ArrayList<Student> loaded = (ArrayList<Student>) ois.readObject();
+            studentList = loaded;
+
             int maxId = 100;
-            while ((line = reader.readLine()) != null) {
-                String[] parts = line.split(",", -1);
-                if (parts.length == 5) {
-                    try {
-                        int id = Integer.parseInt(parts[0].trim());
-                        String name = parts[1].trim();
-                        String email = parts[2].trim();
-                        String phone = parts[3].trim();
-                        String department = parts[4].trim();
-                        
-                        Student s = new Student(id, name, email, phone, department);
-                        studentList.add(s);
-                        if (id > maxId) {
-                            maxId = id;
-                        }
-                    } catch (NumberFormatException e) {
-                        // Ignore corrupt rows
-                    }
+            for (Student s : studentList) {
+                if (s.getId() > maxId) {
+                    maxId = s.getId();
                 }
             }
-            // Update counter sequence
             Student.idCounter = maxId + 1;
-        } catch (IOException e) {
-            System.out.println("Error loading student records from file: " + e.getMessage());
+        } catch (IOException | ClassNotFoundException e) {
+            System.out.println("Error loading student records: " + e.getMessage());
         }
     }
 
-    // Method to save students to text file
-    private static void saveStudentsToFile() {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(FILE_NAME))) {
-            for (Student s : studentList) {
-                writer.write(String.format("%d,%s,%s,%s,%s\n", 
-                        s.getId(), s.getName(), s.getEmail(), s.getPhone(), s.getDepartment()));
-            }
+    // Save students to serialized file
+    private static void saveStudents() {
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(FILE_NAME))) {
+            oos.writeObject(studentList);
         } catch (IOException e) {
-            System.out.println("Error saving student records to file: " + e.getMessage());
+            System.out.println("Error saving student records: " + e.getMessage());
         }
     }
 
-    // Method to add a new student
     private static void addStudent(Scanner scanner) {
         System.out.println("--- Add Student ---");
-        
+
         System.out.print("Enter Name: ");
         String name = scanner.nextLine().trim();
         while (name.isEmpty()) {
@@ -162,34 +164,60 @@ public class StudentManagement {
             name = scanner.nextLine().trim();
         }
 
-        System.out.print("Enter Email (@klu.ac.in): ");
+        System.out.print("Enter Email: ");
         String email = scanner.nextLine().trim();
         while (email.isEmpty() || !email.endsWith("@klu.ac.in")) {
-            System.out.print("Invalid format. Enter Email (@klu.ac.in): ");
+            System.out.print("Invalid email. Must end with @klu.ac.in. Enter Email: ");
             email = scanner.nextLine().trim();
         }
 
-        System.out.print("Enter Phone (10 digits): ");
+        System.out.print("Enter Phone: ");
         String phone = scanner.nextLine().trim();
         while (!phone.matches("\\d{10}")) {
-            System.out.print("Invalid format. Enter Phone (10 digits): ");
+            System.out.print("Invalid phone. Enter 10 digits. Enter Phone: ");
             phone = scanner.nextLine().trim();
         }
 
-        System.out.print("Enter Department (e.g., IT, CS, ECE): ");
+        System.out.print("Enter Department: ");
         String department = scanner.nextLine().trim();
         while (department.isEmpty()) {
             System.out.print("Department cannot be empty. Enter Department: ");
             department = scanner.nextLine().trim();
         }
 
-        Student student = new Student(name, email, phone, department);
+        System.out.print("Enter Gender (Male/Female/Other): ");
+        String gender = scanner.nextLine().trim();
+        while (!isValidGender(gender)) {
+            System.out.print("Invalid gender. Enter Gender (Male/Female/Other): ");
+            gender = scanner.nextLine().trim();
+        }
+        gender = normalizeGender(gender);
+
+        System.out.print("Enter Date of Birth (DD/MM/YYYY): ");
+        String dateOfBirth = scanner.nextLine().trim();
+        while (!dateOfBirth.matches("\\d{2}/\\d{2}/\\d{4}")) {
+            System.out.print("Invalid format. Enter Date of Birth (DD/MM/YYYY): ");
+            dateOfBirth = scanner.nextLine().trim();
+        }
+
+        Student student = new Student(name, email, phone, department, gender, dateOfBirth);
         studentList.add(student);
-        saveStudentsToFile(); // Save changes to disk
+        saveStudents();
         System.out.println("\nSuccess: Student added successfully with ID: " + student.getId());
     }
 
-    // Method to view all students
+    private static boolean isValidGender(String gender) {
+        return gender.equalsIgnoreCase("Male")
+                || gender.equalsIgnoreCase("Female")
+                || gender.equalsIgnoreCase("Other");
+    }
+
+    private static String normalizeGender(String gender) {
+        if (gender.equalsIgnoreCase("Male")) return "Male";
+        if (gender.equalsIgnoreCase("Female")) return "Female";
+        return "Other";
+    }
+
     private static void viewStudents() {
         System.out.println("--- Student Records ---");
         if (studentList.isEmpty()) {
@@ -197,16 +225,13 @@ public class StudentManagement {
             return;
         }
 
-        System.out.println("+------+----------------------+------------------------------+--------------+--------------+");
-        System.out.println("| ID   | Name                 | Email                        | Phone        | Department   |");
-        System.out.println("+------+----------------------+------------------------------+--------------+--------------+");
+        printTableHeader();
         for (Student student : studentList) {
             System.out.println(student);
         }
-        System.out.println("+------+----------------------+------------------------------+--------------+--------------+");
+        printTableFooter();
     }
 
-    // Method to search students by name
     private static void searchStudent(Scanner scanner) {
         System.out.println("--- Search Student by Name ---");
         System.out.print("Enter name to search: ");
@@ -223,9 +248,8 @@ public class StudentManagement {
         for (Student student : studentList) {
             if (student.getName().toLowerCase().contains(query)) {
                 if (!printedHeader) {
-                    System.out.println("\n+------+----------------------+------------------------------+--------------+--------------+");
-                    System.out.println("| ID   | Name                 | Email                        | Phone        | Department   |");
-                    System.out.println("+------+----------------------+------------------------------+--------------+--------------+");
+                    System.out.println();
+                    printTableHeader();
                     printedHeader = true;
                 }
                 System.out.println(student);
@@ -234,7 +258,7 @@ public class StudentManagement {
         }
 
         if (printedHeader) {
-            System.out.println("+------+----------------------+------------------------------+--------------+--------------+");
+            printTableFooter();
         }
 
         if (!found) {
@@ -242,7 +266,6 @@ public class StudentManagement {
         }
     }
 
-    // Method to delete a student by ID
     private static void deleteStudent(Scanner scanner) {
         System.out.println("--- Delete Student ---");
         viewStudents();
@@ -271,7 +294,7 @@ public class StudentManagement {
             String confirm = scanner.nextLine().trim().toLowerCase();
             if (confirm.equals("y") || confirm.equals("yes")) {
                 studentList.remove(toRemove);
-                saveStudentsToFile(); // Save changes to disk
+                saveStudents();
                 System.out.println("\nSuccess: Student record deleted successfully.");
             } else {
                 System.out.println("Delete action cancelled.");
