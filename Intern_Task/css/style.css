@@ -1,0 +1,67 @@
+/* Design System Accents & Enhancements */
+
+:root {
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-display: 'DM Sans', var(--font-sans);
+  --color-primary: #ac2b27;
+  --color-primary-hover: #c94139;
+  --color-accent: #e4544b;
+  --color-bg-base: #F7F7F5;
+  --color-panel: #FBFAF9;
+  --color-border: #E7E6E5;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(141, 112, 109, 0.2);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(141, 112, 109, 0.4);
+}
+
+/* Glassmorphism Refinements */
+.glass-card {
+  background: var(--color-panel);
+  border: 1px solid var(--color-border);
+  box-shadow: 0 4px 20px -2px rgba(28, 25, 23, 0.05), 0 2px 8px -1px rgba(28, 25, 23, 0.03);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+/* Smooth Interactive Elements */
+input, select, textarea, button {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Custom Focus Ring Indicator */
+input:focus, select:focus, textarea:focus {
+  border-color: var(--color-accent) !important;
+  box-shadow: 0 0 0 4px rgba(228, 84, 75, 0.15) !important;
+}
+
+/* Custom Row Animation delays */
+.stagger-row {
+  animation: slideInRow 0.4s ease-out forwards;
+}
+
+@keyframes slideInRow {
+  0% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
