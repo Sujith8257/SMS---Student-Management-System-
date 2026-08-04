@@ -4,16 +4,13 @@
  */
 
 (function () {
-    const STORAGE_KEY = 'sms_students_registry';
+    const STORAGE_KEY = 'sms_students_registry_v2';
 
-    // Mock initial data if storage is empty
+    // Mock initial data matching the previous hardcoded values
     const initialStudents = [
-        { id: 101, name: "Alexander Wright", email: "alex.wright@university.edu", age: 20, course: "Computer Science", grade: 3.85 },
-        { id: 102, name: "Sophia Martinez", email: "s.martinez@university.edu", age: 21, course: "Data Science", grade: 3.92 },
-        { id: 103, name: "Marcus Thompson", email: "marcus.t@university.edu", age: 22, course: "Mechanical Engineering", grade: 2.85 },
-        { id: 104, name: "Emily Henderson", email: "emily.h@university.edu", age: 19, course: "Bioinformatics", grade: 3.70 },
-        { id: 105, name: "Darius Miller", email: "darius.m@university.edu", age: 23, course: "Cybersecurity", grade: 1.82 },
-        { id: 106, name: "Livia Vance", email: "liv.vance@university.edu", age: 20, course: "Civil Engineering", grade: 3.45 }
+        { id: 101, name: "Rahul Sharma", email: "rahul@gmail.com", phone: "9876543210", dept: "IT", gender: "Male", dob: "12-05-2002" },
+        { id: 102, name: "Priya Patel", email: "priya.p@student.edu", phone: "9876543211", dept: "CS", gender: "Female", dob: "24-08-2001" },
+        { id: 103, name: "Ananya Singh", email: "asingh22@edu.com", phone: "9876543212", dept: "ECE", gender: "Female", dob: "10-11-2003" }
     ];
 
     // Helper to read database
@@ -52,9 +49,10 @@
                 id: nextId,
                 name: studentData.name,
                 email: studentData.email,
-                age: parseInt(studentData.age),
-                course: studentData.course,
-                grade: parseFloat(studentData.grade)
+                phone: studentData.phone,
+                dept: studentData.dept,
+                gender: studentData.gender,
+                dob: studentData.dob
             };
 
             students.push(newStudent);
@@ -71,9 +69,10 @@
                     id: parseInt(id),
                     name: updatedData.name,
                     email: updatedData.email,
-                    age: parseInt(updatedData.age),
-                    course: updatedData.course,
-                    grade: parseFloat(updatedData.grade)
+                    phone: updatedData.phone,
+                    dept: updatedData.dept,
+                    gender: updatedData.gender,
+                    dob: updatedData.dob
                 };
                 saveStoredStudents(students);
                 return students[index];

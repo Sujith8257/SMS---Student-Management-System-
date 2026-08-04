@@ -264,7 +264,7 @@
 <div class="panel p-5 md:p-6 flex items-center justify-between control-lift transition-all duration-300">
 <div>
 <p class="font-label-eyebrow text-label-eyebrow text-on-surface-variant mb-2 uppercase">Total Students</p>
-<p class="font-headline-md text-headline-md text-on-surface">42</p>
+<p id="totalStudentsVal" class="font-headline-md text-headline-md text-on-surface">0</p>
 </div>
 <div class="w-12 h-12 rounded-full accent-band flex items-center justify-center text-[#79716B]">
 <span class="material-symbols-outlined">school</span>
@@ -273,7 +273,7 @@
 <div class="panel p-5 md:p-6 flex items-center justify-between control-lift transition-all duration-300">
 <div>
 <p class="font-label-eyebrow text-label-eyebrow text-on-surface-variant mb-2 uppercase">Departments</p>
-<p class="font-headline-md text-headline-md text-on-surface">6</p>
+<p id="totalDeptsVal" class="font-headline-md text-headline-md text-on-surface">0</p>
 </div>
 <div class="w-12 h-12 rounded-full accent-band flex items-center justify-center text-[#79716B]">
 <span class="material-symbols-outlined">domain</span>
@@ -282,7 +282,7 @@
 <div class="panel p-5 md:p-6 flex items-center justify-between control-lift transition-all duration-300">
 <div>
 <p class="font-label-eyebrow text-label-eyebrow text-on-surface-variant mb-2 uppercase">Today's Registrations</p>
-<p class="font-headline-md text-headline-md text-on-surface">3</p>
+<p id="todaysRegistrationsVal" class="font-headline-md text-headline-md text-on-surface">0</p>
 </div>
 <div class="w-12 h-12 rounded-full accent-band flex items-center justify-center text-[#79716B]">
 <span class="material-symbols-outlined">trending_up</span>
@@ -332,6 +332,7 @@
 </main>
 
 
+<script src="js/app.js"></script>
 <script>
     // Navigation Drawer Toggle
     const mobileMenuBtn = document.getElementById('mobileMenuBtn');
@@ -342,7 +343,7 @@
         });
     }
 
-    // Dynamic User Configuration
+    // Dynamic User Configuration & Statistics Loader
     document.addEventListener('DOMContentLoaded', () => {
         const username = localStorage.getItem('sms_current_user') || 'Admin';
         
@@ -356,6 +357,30 @@
         const profilePic = document.getElementById('userProfilePic');
         if (profilePic && username.trim().length > 0) {
             profilePic.textContent = username.trim()[0].toUpperCase();
+        }
+
+        // Load dynamic statistics from local storage
+        if (window.SMS) {
+            const students = window.SMS.getStudents();
+            
+            // Total Students
+            const totalStudentsVal = document.getElementById('totalStudentsVal');
+            if (totalStudentsVal) {
+                totalStudentsVal.textContent = students.length;
+            }
+
+            // Departments (unique count)
+            const totalDeptsVal = document.getElementById('totalDeptsVal');
+            if (totalDeptsVal) {
+                const uniqueDepts = new Set(students.map(s => s.dept.trim().toUpperCase()));
+                totalDeptsVal.textContent = uniqueDepts.size;
+            }
+
+            // Today's Registrations (entries registered during this session/new entries)
+            const todaysRegistrationsVal = document.getElementById('todaysRegistrationsVal');
+            if (todaysRegistrationsVal) {
+                todaysRegistrationsVal.textContent = students.length > 3 ? (students.length - 3) : 0;
+            }
         }
     });
 </script>
